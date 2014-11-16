@@ -110,14 +110,7 @@
 				});
 			}
 		};
-		/*
-		tooltip???
-			.attr('class', 'd3-tip')
-			.offset([-10, 0])
-			.html(function(d) {
-				return "<strong>Frequency:</strong> <span style='color:red'>" + d.GOPById + "</span>";
-			})
-		*/
+
 		queue()
 		    .defer(d3.json, "us.json")
 		    .defer(d3.tsv, "state_vote_totals2.tsv", function(d) { 
@@ -142,8 +135,7 @@
 		      .attr("class", function(d) { return colors(GainById.get(d.id)); })
 		      .attr("d", path)
 		      .on("mouseover", function(d, i){
-			      	var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
-			    	var event = d3.event;
+					console.log(d.id);
 					tooltip.update(d);
 					tooltip.show();
 		      })
