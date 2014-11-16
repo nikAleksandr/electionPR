@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html class="no-js" itemscope itemtype="http://schema.org/Product">
+    <head>
+    	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" media="all">
+    	<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://d3js.org/topojson.v1.min.js"></script>
+    <style>
+		
+		.counties {
+		  fill: none;
+		}
+		
+		.states {
+		  fill: none;
+		  stroke: #000;
+		  stroke-linejoin: round;
+		}
+		
+		.q0-9 { fill:rgb(247,251,255); }
+		.q1-9 { fill:rgb(222,235,247); }
+		.q2-9 { fill:rgb(198,219,239); }
+		.q3-9 { fill:rgb(158,202,225); }
+		.q4-9 { fill:rgb(107,174,214); }
+		.q5-9 { fill:rgb(66,146,198); }
+		.q6-9 { fill:rgb(33,113,181); }
+		.q7-9 { fill:rgb(8,81,156); }
+		.q8-9 { fill:rgb(8,48,107); }
+		
+	</style>	
+	</head>
+	<body>
+		<div id="header">
+			
+		</div>
+		
+		<div id="map">
+			
+		</div>
+		<div id="congress">
+			
+		</div>
+		<div id="content">
+			
+		</div>		
+		
+	</body>
+	<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <!-- SmartMenus jQuery plugin -->
+    
+    <script>
+    	var width = 960,
+		    height = 600;
+		
+		var GOPById = d3.map();
+		
+		var quantize = d3.scale.quantize()
+		    .domain([0, .99])
+		    .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+		
+		var projection = d3.geo.albersUsa()
+		    .scale(1280)
+		    .translate([width / 2, height / 2]);
+		
+		var path = d3.geo.path()
+		    .projection(projection);
+		
+		var svg = d3.select("#map").append("svg")
+		    .attr("width", width)
+		    .attr("height", height);
+		
+		queue()
+		    .defer(d3.json, "us.json")
+		    .defer(d3.tsv, "state_vote_totals.tsv", function(d) { GOPById.set(d.id, +d.sim_rep_seats); })
+		    .await(ready);
+		
+		function ready(error, us) {
+		  svg.append("g")
+		      .attr("class", "states")
+		    .selectAll("path")
+		      .data(topojson.feature(us, us.objects.states).features)
+		    .enter().append("path")
+		      .attr("class", function(d) { return quantize(GOPById.get(d.id)); })
+		      .attr("d", path);
+		
+		}
+		
+		d3.select(self.frameElement).style("height", height + "px");
+    </script>
+</html>
