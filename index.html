@@ -26,7 +26,11 @@
 		.third { fill:#128212; }
 		.no-change { fill:rgb(210,200,185); }
 		
-		.tooltip {
+		#tt {
+			width:200px;
+			height:auto;
+			z-index: 100;
+		  position: absolute;
 		  line-height: 1;
 		  font-weight: bold;
 		  padding: 12px;
@@ -39,10 +43,10 @@
 	</head>
 	<body>
 		<div id="header">
-			
 		</div>
 		
 		<div id="map">
+		<div id="tt"></div>
 			
 		</div>
 		<div id="congress">
@@ -60,13 +64,13 @@
     <script>
     	var width = 960,
 		    height = 600;
-		
+			
 		var stateById = d3.map(),
 			GainById = d3.map(),
-			GOPById = d3.map(),
-			demById = d3.map(),
-			totalById = d3.map(),
-			GOPDiffById = d3.map();
+			GOPGainsById = d3.map(),
+			demGainsById = d3.map(),
+			thirdGainsById = d3.map(),
+			totalSeatsById = d3.map();
 		
 		//adjust this to make it return classes like GOPplus DemPlus
 		var colors = function(gain){
@@ -92,22 +96,41 @@
 		    .attr("width", width)
 		    .attr("height", height);
 		
-		  //would like to make this into an object with methods such as .show() and .hide() and .update()
+		//tooltip object
 		var tooltip = {
 			initialize: function(){
-				d3.select("svg").append("div")
-					.attr("class", "tooltip")
-					.html(function() {
-						return '<div class="tooltip-content"><strong>' + 'stateNameHere' + '</strong></div>';
+				var tt = d3.select("#tt");
+				tt.html(function() {
+						return '<div class="tooltip-content"></div>';
+						
 					});
 			},
-			show: function(){ $(".tooltip").show();},
-			hide: function(){ $(".tooltip").hide();},
-			update: function(d){
+			show: function(){ $(".tt").show();},
+			hide: function(){ $(".tt").hide();},
+			update: function(d, position){
 				d3.select(".tooltip-content").remove();
-				d3.select(".tooltip").html(function(){
-					return '<div class="tooltip-content"><strong>' + stateById[d.id] + '</strong></div>';
+				var tt = d3.select("#tt");
+				var left = position.x, leftOff = 25;
+				var top = position.y, topOff = 25;
+				var gain, second, third;
+				switch(GainById.get(d.id)){
+					case 1 : gain = "Republicans would gain " + GOPGainsById.get(d.id) + " out of " + totalSeatsById.get(d.id) + " seats";
+						break;
+					case 2 : gain = "Democrats would gain " + demGainsById.get(d.id) + " out of " + totalSeatsById.get(d.id) + " seats";
+						break;
+					case 3 : gain = "Thid Parties would gain " + thirdGainsById.get(d.id) + " out of " + totalSeatsById.get(d.id) + " seats";
+						break;
+					case 0 : gain = "There would be no change";
+						break;
+				}
+				tt.html(function(){
+					return '<div class="tooltip-content"><table class="table table-condensed"><tr><th colspan="2"><strong>In a PR system in ' + stateById.get(d.id) + '</strong></th></tr><tr><td>' + gain + '</td></tr></table></div>';
 				});
+				
+				tt.transition()
+					.style("left", (left + leftOff) + "px")
+					.style("top", (top + topOff) + "px");
+				
 			}
 		};
 
@@ -116,9 +139,10 @@
 		    .defer(d3.tsv, "state_vote_totals2.tsv", function(d) { 
 		    	stateById.set(d.id, d.state),
 		    	GainById.set(d.id, +d.largest_PR_gain),
-		    	GOPById.set(d.id, +d.rep_vote_total),
-		    	demById.set(d.id, +d.dem_vote_total),
-		    	totalById.set(d.id, +d.real_vote_total); 
+		    	GOPGainsById.set(d.id, +d.GOP_PR_gains),
+		    	demGainsById.set(d.id, +d.dem_PR_gains),
+		    	thirdGainsById.set(d.id, +d.sim_alt_seats),
+		    	totalSeatsById.set(d.id, +d.real_seat_total);
 		    })
 		    .await(ready);
 		
@@ -135,8 +159,8 @@
 		      .attr("class", function(d) { return colors(GainById.get(d.id)); })
 		      .attr("d", path)
 		      .on("mouseover", function(d, i){
-					console.log(d.id);
-					tooltip.update(d);
+		      		var currentMousePos = this.getBoundingClientRect();
+					tooltip.update(d, currentMousePos);
 					tooltip.show();
 		      })
 		      .on("mouseout", tooltip.hide);
