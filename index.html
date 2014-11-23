@@ -62,6 +62,8 @@
     <!-- SmartMenus jQuery plugin -->
     
     <script>
+    	var integer = d3.format(".0f");
+    
     	var width = 960,
 		    height = 600;
 			
@@ -105,8 +107,8 @@
 						
 					});
 			},
-			show: function(){ $(".tt").show();},
-			hide: function(){ $(".tt").hide();},
+			show: function(){ $("#tt").show();},
+			hide: function(){ $("#tt").hide();},
 			update: function(d, position){
 				d3.select(".tooltip-content").remove();
 				var tt = d3.select("#tt");
@@ -118,7 +120,7 @@
 						break;
 					case 2 : gain = "Democrats would gain " + demGainsById.get(d.id) + " out of " + totalSeatsById.get(d.id) + " seats";
 						break;
-					case 3 : gain = "Thid Parties would gain " + thirdGainsById.get(d.id) + " out of " + totalSeatsById.get(d.id) + " seats";
+					case 3 : gain = "Third Parties would gain " + integer(thirdGainsById.get(d.id)) + " out of " + totalSeatsById.get(d.id) + " seats";
 						break;
 					case 0 : gain = "There would be no change";
 						break;
