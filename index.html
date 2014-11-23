@@ -37,6 +37,7 @@
 		  background: rgba(0, 0, 0, 0.8);
 		  color: #fff;
 		  border-radius: 2px;
+		  pointer-events:none;
 		}
 		
 	</style>	
@@ -72,12 +73,12 @@
 			GOPGainsById = d3.map(),
 			demGainsById = d3.map(),
 			thirdGainsById = d3.map(),
-			totalSeatsById = d3.map().
-			GOPRealSeats = d3.map(),
-			demRealSeats = d3.map(),
-			GOPSimSeats = d3.map(),
-			demSimSeats = d3.map(),
-			thirdSimSeats = d3.map();
+			totalSeatsById = d3.map(),
+			GOPRealSeatsById = d3.map(),
+			demRealSeatsById = d3.map(),
+			GOPSimSeatsById = d3.map(),
+			demSimSeatsById = d3.map(),
+			thirdSimSeatsById = d3.map();
 		
 		//adjust this to make it return classes like GOPplus DemPlus
 		var colors = function(gain){
@@ -140,21 +141,30 @@
 				
 			}
 		};
+		
+		//Congress Varialbes and functions
+		function member(temp_state, temp_party )  {
+			this.state = temp_state;
+			this.party = temp_real_party;
+		};
+		
+		var Real_congress = [];
+		var PR_congress = [];
 
 		queue()
 		    .defer(d3.json, "us.json")
 		    .defer(d3.tsv, "state_vote_totals2.tsv", function(d) { 
-		    	stateById.set(d.id, d.state),
-		    	GainById.set(d.id, +d.largest_PR_gain),
-		    	GOPGainsById.set(d.id, +d.GOP_PR_gains),
-		    	demGainsById.set(d.id, +d.dem_PR_gains),
-		    	thirdGainsById.set(d.id, +d.sim_alt_seats),
-		    	totalSeatsById.set(d.id, +d.real_seat_total),
-		    	GOPRealSeats.set(d.id, +d.real_rep_seats),
-		    	demRealSeats.set(d.id, +d.real_dem_seats),
-		    	GOPSimSeats.set(d.id, +d.GOP_sim_seats),
-		    	demSimSeats.set(d.id, +d.dem_sim_seats),
-		    	thirdSimSeats.set(d.id, +d.alt_sim_seats);
+			    	stateById.set(d.id, d.state),
+			    	GainById.set(d.id, +d.largest_PR_gain),
+			    	GOPGainsById.set(d.id, +d.GOP_PR_gains),
+			    	demGainsById.set(d.id, +d.dem_PR_gains),
+			    	thirdGainsById.set(d.id, +d.sim_alt_seats),
+			    	totalSeatsById.set(d.id, +d.real_seat_total),
+			    	GOPRealSeatsById.set(d.id, +d.real_rep_seats),
+			    	demRealSeatsById.set(d.id, +d.real_dem_seats),
+			    	GOPSimSeatsById.set(d.id, +d.GOP_sim_seats),
+			    	demSimSeatsById.set(d.id, +d.dem_sim_seats),
+			    	thirdSimSeatsById.set(d.id, +d.alt_sim_seats);
 		    })
 		    .await(ready);
 		
@@ -180,24 +190,53 @@
 		}
 		
 		///Congress Code
-		var total_seats = 437;
-		var GOP_real = 246;
-		var dem_real = 191;
-		var third_real = 0;
 		
-		var GOP_sim = 226;
-		var dem_sim = 197;
-		var third_sim = 14;
+		for(i=0; i<57; i++){
+			console.log(stateById.get(parseInt(i)) );
 			
-		var Congress = [];
-			for(i=0; i<57; i++){
-				if(typeof(stateById.get(i))!="undefined"){
-					var temp_GOP_real_seats = GOPSeatsById.get(i);
-					
-					
-					Congress.push()
+			if(typeof(stateById.get(i))!="undefined"){
+				var state = stateById.get(i);
+				var state_GOP_real_seats = GOPSeatsById.get(i);
+				var state_dem_real_seats = demSeatsById.get(i);
+				var state_GOP_sim_seats = GOPSimSeatsById.get(i);
+				var state_dem_sim_seats = demSimSeatsById.get(i);
+				var state_third_sim_seats = thirdSimSeatsById.get(i);
+				var state_total_seats = totalSeatsById.get(i);
+				
+				for(j=0; j<state_total_seats; j++){
+					var R = 0, R_PR = 0;
+					var D = 0, D_PR = 0;
+					var T = 0, T_PR = 0;
+					while(R<state_GOP_real_seats){
+						var mem = new member(state, 1);
+						Real_congress.push(mem);
+						R++;
+					}
+					while(D<state_dem_real_seats){
+						var mem = new member(state, 2);
+						Real_congress.push(mem);
+						D++;
+					}
+					console.log("Finished with " + state + ". " + Real_congress.length());
+					//Now Simulated Congress
+					while(R_PR<state_GOP_sim_seats){
+						var mem = new member(state, 1);
+						PR_congress.push(mem);
+						R_PR++;
+					}
+					while(D_PR<state_dem_sim_seats){
+						var mem = new member(state, 2);
+						PR_congress.push(mem);
+						D_PR++;
+					}
+					while(T_PR<state_third_sim_seats){
+						var mem = new member(state, 3);
+						PR_congress.push(mem);
+						T_PR++;
+					}
 				}
 			}
+		}
 			
 		
 		
