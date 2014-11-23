@@ -72,7 +72,12 @@
 			GOPGainsById = d3.map(),
 			demGainsById = d3.map(),
 			thirdGainsById = d3.map(),
-			totalSeatsById = d3.map();
+			totalSeatsById = d3.map().
+			GOPRealSeats = d3.map(),
+			demRealSeats = d3.map(),
+			GOPSimSeats = d3.map(),
+			demSimSeats = d3.map(),
+			thirdSimSeats = d3.map();
 		
 		//adjust this to make it return classes like GOPplus DemPlus
 		var colors = function(gain){
@@ -116,11 +121,11 @@
 				var top = position.y, topOff = 25;
 				var gain, second, third;
 				switch(GainById.get(d.id)){
-					case 1 : gain = "Republicans would gain " + GOPGainsById.get(d.id) + " out of " + totalSeatsById.get(d.id) + " seats";
+					case 1 : gain = "Republicans would gain " + integer(GOPGainsById.get(d.id)) + " out of " + integer(totalSeatsById.get(d.id)) + " seats";
 						break;
-					case 2 : gain = "Democrats would gain " + demGainsById.get(d.id) + " out of " + totalSeatsById.get(d.id) + " seats";
+					case 2 : gain = "Democrats would gain " + integer(demGainsById.get(d.id)) + " out of " + integer(totalSeatsById.get(d.id)) + " seats";
 						break;
-					case 3 : gain = "Third Parties would gain " + integer(thirdGainsById.get(d.id)) + " out of " + totalSeatsById.get(d.id) + " seats";
+					case 3 : gain = "Third Parties would gain " + integer(thirdGainsById.get(d.id)) + " out of " + integer(totalSeatsById.get(d.id)) + " seats";
 						break;
 					case 0 : gain = "There would be no change";
 						break;
@@ -144,7 +149,12 @@
 		    	GOPGainsById.set(d.id, +d.GOP_PR_gains),
 		    	demGainsById.set(d.id, +d.dem_PR_gains),
 		    	thirdGainsById.set(d.id, +d.sim_alt_seats),
-		    	totalSeatsById.set(d.id, +d.real_seat_total);
+		    	totalSeatsById.set(d.id, +d.real_seat_total),
+		    	GOPRealSeats.set(d.id, +d.real_rep_seats),
+		    	demRealSeats.set(d.id, +d.real_dem_seats),
+		    	GOPSimSeats.set(d.id, +d.GOP_sim_seats),
+		    	demSimSeats.set(d.id, +d.dem_sim_seats),
+		    	thirdSimSeats.set(d.id, +d.alt_sim_seats);
 		    })
 		    .await(ready);
 		
@@ -166,8 +176,31 @@
 					tooltip.show();
 		      })
 		      .on("mouseout", tooltip.hide);
-			
+				
 		}
+		
+		///Congress Code
+		var total_seats = 437;
+		var GOP_real = 246;
+		var dem_real = 191;
+		var third_real = 0;
+		
+		var GOP_sim = 226;
+		var dem_sim = 197;
+		var third_sim = 14;
+			
+		var Congress = [];
+			for(i=0; i<57; i++){
+				if(typeof(stateById.get(i))!="undefined"){
+					var temp_GOP_real_seats = GOPSeatsById.get(i);
+					
+					
+					Congress.push()
+				}
+			}
+			
+		
+		
 		
 		d3.select(self.frameElement).style("height", height + "px");
     </script>
