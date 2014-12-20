@@ -1,6 +1,6 @@
 id	state	dem_vote_total	rep_vote_total	real_vote_total	real_dem_seats	real_rep_seats	real_seat_total	sim_rep_seats	sim_dem_seats	sim_alt_seats	GOP_remainder	dem_remainder	alt_remainder	GOP_sim_seats	dem_sim_seats	alt_sim_seats	flloor_sim_seats_plus_one	sim seat check	GOP_PR_gains	dem_PR_gains	largest_PR_gain
 2	AK	99069	125410	242844	0	1	1	0.516	0.408	0.07562468087	0.516	0.408	0.07562468087	1	0	0	1	Correct	0	0	0
-1	AL	551619	192515	782964	1	6	7	1.721	4.932	0.3471551693	0.721	0.932	0.3471551693	2	5	0	0	Correct	-4	4	2
+1	AL	192515	551619	782964	1	6	7	1.721	4.932	0.3471551693	0.721	0.932	0.3471551693	5	2	0	0	Correct	-1	1	2
 5	AR	253616	506992	826342	0	4	4	2.454	1.228	0.3181927096	0.454	0.228	0.3181927096	3	1	0	1	Correct	-1	1	2
 4	AZ	572084	811482	1455579	5	4	9	5.017	3.537	0.4452640496	0.017	0.537	0.4452640496	5	4	0	1	Correct	1	-1	1
 6	CA	3424521	2566320	6240898	38	15	53	21.794	29.082	2.123575966	0.794	0.082	0.1235759662	22	29	2	1	Correct	7	-9	1
