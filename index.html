@@ -60,9 +60,11 @@
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="objSort.js"></script>
     <!-- SmartMenus jQuery plugin -->
     
     <script>
+	var globalData;
     	var integer = d3.format(".0f");
     
     	var width = 960,
@@ -145,7 +147,7 @@
 		//Congress Varialbes and functions
 		function member(temp_state, temp_party )  {
 			this.state = temp_state;
-			this.party = temp_real_party;
+			this.party = temp_party;
 		};
 		
 		var Real_congress = [];
@@ -187,59 +189,95 @@
 		      })
 		      .on("mouseout", tooltip.hide);
 				
-		}
-		
-		///Congress Code
-		
-		for(i=0; i<57; i++){
-			console.log(stateById.get(parseInt(i)) );
-			
-			if(typeof(stateById.get(i))!="undefined"){
-				var state = stateById.get(i);
-				var state_GOP_real_seats = GOPSeatsById.get(i);
-				var state_dem_real_seats = demSeatsById.get(i);
-				var state_GOP_sim_seats = GOPSimSeatsById.get(i);
-				var state_dem_sim_seats = demSimSeatsById.get(i);
-				var state_third_sim_seats = thirdSimSeatsById.get(i);
-				var state_total_seats = totalSeatsById.get(i);
 				
-				for(j=0; j<state_total_seats; j++){
-					var R = 0, R_PR = 0;
-					var D = 0, D_PR = 0;
-					var T = 0, T_PR = 0;
-					while(R<state_GOP_real_seats){
-						var mem = new member(state, 1);
-						Real_congress.push(mem);
-						R++;
+			Congress.init();
+			Congress.draw();
+		}		
+		
+		//ShowCongress
+		var Congress = {
+			real: true,
+			init: function(){
+					for(i=0; i<57; i++){
+						if(typeof(stateById.get(i))!="undefined"){
+							var state = stateById.get(i);
+							var state_GOP_real_seats = GOPRealSeatsById.get(i);
+							var state_dem_real_seats = demRealSeatsById.get(i);
+							var state_GOP_sim_seats = GOPSimSeatsById.get(i);
+							var state_dem_sim_seats = demSimSeatsById.get(i);
+							var state_third_sim_seats = thirdSimSeatsById.get(i);
+							var state_total_seats = totalSeatsById.get(i);
+							
+							var R = 0, R_PR = 0;
+							var D = 0, D_PR = 0;
+							var T = 0, T_PR = 0;
+							
+							while(R<state_GOP_real_seats){
+								var mem = new member(state, 1);
+								Real_congress.push(mem);
+								R++;
+							}
+							while(D<state_dem_real_seats){
+								var mem = new member(state, 2);
+								Real_congress.push(mem);
+								D++;
+							}
+								//console.log("Finished with " + state + ". " + Real_congress.length);
+							//Now Simulated Congress
+							while(R_PR<state_GOP_sim_seats){
+								var mem = new member(state, 1);
+								PR_congress.push(mem);
+								R_PR++;
+							}
+							while(D_PR<state_dem_sim_seats){
+								var mem = new member(state, 2);
+								PR_congress.push(mem);
+								D_PR++;
+							}
+							while(T_PR<state_third_sim_seats){
+								var mem = new member(state, 3);
+								PR_congress.push(mem);
+								T_PR++;
+							}	
+						}
 					}
-					while(D<state_dem_real_seats){
-						var mem = new member(state, 2);
-						Real_congress.push(mem);
-						D++;
-					}
-					console.log("Finished with " + state + ". " + Real_congress.length());
-					//Now Simulated Congress
-					while(R_PR<state_GOP_sim_seats){
-						var mem = new member(state, 1);
-						PR_congress.push(mem);
-						R_PR++;
-					}
-					while(D_PR<state_dem_sim_seats){
-						var mem = new member(state, 2);
-						PR_congress.push(mem);
-						D_PR++;
-					}
-					while(T_PR<state_third_sim_seats){
-						var mem = new member(state, 3);
-						PR_congress.push(mem);
-						T_PR++;
-					}
+			},
+			draw: function(){
+				//draw will use the same variables as update, but assume real as the values
+				var titleText, congressArray;
+				switch(real){
+					case false:
+						titleText = "2014 Congress simlated under a PR system"
+						break;
+					default:
+						titleText = "2014 Congress"
 				}
-			}
-		}
-			
-		
-		
+				
+				congressArray = congressArray.objSort("party", "state");
+					
+					var circleR = 8;
+					var rowNums = 10;
+					var columnNums = Math.ceil(437/rowNums);
+					var conWidth = columnNums*circleR*2;
+				   
+				   var title = d3.select("#congress").append("h1").text(titleText);
+				   var congressBtn = d3.select("#congress").append("div").text("Button").on(click, updateCongress();)
+				   
+				   var congressSVG = d3.select('#congress').append("svg").attr("width", width).attr("height", height);
+				   
+				   var makeCircles = congressSVG.selectAll("circle").data(congressArray).enter()
+				   		.append("circle")
+					   		.attr("cx", function(d,i) { return Math.ceil((i+1)/rowNums)*circleR*2})
+					   		.attr("cy", function(d,i) { return (i%rowNums+1)*(circleR*2)  })
+					   		.attr("r", circleR)
+					   		.attr("class", function(d) {return "member" + " " + colors(d.party) + " " +  d.state; })
+				   				.append("svg:title").text(function(d){return d.state });
+			},
+			update: function(){
+				if(Congress.real){ Congress.real = false;}else{Congress.real = true;}
+			}   				
+			//add a function that highlights all members from the same state on highlight of any member, and/or allow users to resort on state or party basis with transition
+		};
 		
 		d3.select(self.frameElement).style("height", height + "px");
     </script>
