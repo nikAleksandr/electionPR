@@ -191,6 +191,8 @@
 				
 				
 			Congress.init();
+			var title = d3.select("#congress").append("h1");
+			var congressBtn = d3.select("#congress").append("button").attr('class', 'btn btn-default').text("Current vs. PR Sysem").on("click", function(){Congress.update();});
 			Congress.draw();
 		}		
 		
@@ -212,6 +214,7 @@
 							var D = 0, D_PR = 0;
 							var T = 0, T_PR = 0;
 							
+							//would be better to make a single array with realParty and PRParty properties.  Would enable slick transitions between two types.
 							while(R<state_GOP_real_seats){
 								var mem = new member(state, 1);
 								Real_congress.push(mem);
@@ -245,36 +248,74 @@
 			draw: function(){
 				//draw will use the same variables as update, but assume real as the values
 				var titleText, congressArray;
-				switch(real){
+				switch(Congress.real){
 					case false:
-						titleText = "2014 Congress simlated under a PR system"
+						titleText = "2014 Congress simulated under a Proportional Representation system";
+						congressArray = PR_congress;
 						break;
 					default:
-						titleText = "2014 Congress"
+						titleText = "2014 Congress under the current election system";
+						congressArray = Real_congress;
 				}
 				
 				congressArray = congressArray.objSort("party", "state");
 					
-					var circleR = 8;
-					var rowNums = 10;
-					var columnNums = Math.ceil(437/rowNums);
-					var conWidth = columnNums*circleR*2;
-				   
-				   var title = d3.select("#congress").append("h1").text(titleText);
-				   var congressBtn = d3.select("#congress").append("div").text("Button").on(click, updateCongress();)
-				   
-				   var congressSVG = d3.select('#congress').append("svg").attr("width", width).attr("height", height);
-				   
-				   var makeCircles = congressSVG.selectAll("circle").data(congressArray).enter()
-				   		.append("circle")
-					   		.attr("cx", function(d,i) { return Math.ceil((i+1)/rowNums)*circleR*2})
-					   		.attr("cy", function(d,i) { return (i%rowNums+1)*(circleR*2)  })
-					   		.attr("r", circleR)
-					   		.attr("class", function(d) {return "member" + " " + colors(d.party) + " " +  d.state; })
-				   				.append("svg:title").text(function(d){return d.state });
+				var circleR = 8;
+				var rowNums = 10;
+				var columnNums = Math.ceil(437/rowNums);
+				var conWidth = columnNums*circleR*2;
+				
+				var title = d3.select("#congress").select("h1").text(titleText);
+			   
+			   var congressSVG = d3.select('#congress').append("svg").attr("width", width).attr("height", height);
+			   
+			   var makeCircles = congressSVG.selectAll("circle").data(congressArray).enter()
+			   		.append("circle")
+				   		.attr("cx", function(d,i) { return Math.ceil((i+1)/rowNums)*circleR*2; })
+				   		.attr("cy", function(d,i) { return (i%rowNums+1)*(circleR*2);  })
+				   		.attr("r", circleR)
+				   		.attr("class", function(d) {return "member" + " " + colors(d.party) + " " +  d.state; })
+			   				.append("svg:title").text(function(d){return d.state; });
 			},
 			update: function(){
+				console.log("button was pushed");
 				if(Congress.real){ Congress.real = false;}else{Congress.real = true;}
+				
+				var titleText, congressArray;
+				
+				switch(Congress.real){
+					case false:
+						titleText = "2014 Congress simulated under a Proportional Representation system";
+						congressArray = PR_congress;
+						break;
+					default:
+						titleText = "2014 Congress under the current election system";
+						congressArray = Real_congress;
+				}
+				
+				congressArray = congressArray.objSort("party", "state");
+					
+				var circleR = 8;
+				var rowNums = 10;
+				var columnNums = Math.ceil(437/rowNums);
+				var conWidth = columnNums*circleR*2;
+				
+				var title = d3.select("#congress").select("h1").text(titleText);
+				
+				var congressSVG = d3.select('#congress').select("svg");
+				
+				congressSVG.selectAll("circle").remove();
+			   
+			  // var title = d3.select("#congress").append("h1").text(titleText);
+			   
+			   var makeCircles = congressSVG.selectAll("circle").data(congressArray).enter()
+			   		.append("circle")
+				   		.attr("cx", function(d,i) { return Math.ceil((i+1)/rowNums)*circleR*2; })
+				   		.attr("cy", function(d,i) { return (i%rowNums+1)*(circleR*2);  })
+				   		.attr("r", circleR)
+				   		.attr("class", function(d) {return "member" + " " + colors(d.party) + " " +  d.state; })
+			   				.append("svg:title").text(function(d){return d.state; });
+			
 			}   				
 			//add a function that highlights all members from the same state on highlight of any member, and/or allow users to resort on state or party basis with transition
 		};
